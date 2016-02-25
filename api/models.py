@@ -4,7 +4,7 @@ from django.contrib.gis.db import models
 class Tree(models.Model):
 
     location = models.PointField()
-    current_ingest = models.ForeignKey('ingest')
+    current_ingest = models.ForeignKey('ingest', blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return 'tree_id=%i %s' % (self.pk, str(self.location))
