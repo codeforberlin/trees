@@ -4,7 +4,7 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import GEOSGeometry
 from django.utils.timezone import now
 
-from api.models import Tree, Ingest, Attribute
+from api.models import Ingest, Tree, Attribute, String, Integer, Float
 
 
 def ingest_trees_from_file(filename):
@@ -38,7 +38,7 @@ def ingest_trees_from_file(filename):
             tree = Tree.objects.create(location=point, current_ingest=ingest)
 
         # get the attributes of the current ingest of the tree
-        current_attributes = Attribute.objects.filter(tree=tree, ingest=tree.current_ingest).values()
+        current_attributes = Attribute.objects.filter(tree=tree, ingest=tree.current_ingest)
 
         # prepare update flag
         update = False
@@ -46,9 +46,11 @@ def ingest_trees_from_file(filename):
         # check if one of the attributes changed
         if current_attributes:
             for attribute in current_attributes:
-                if attribute['value'] != unicode(feature.get(attribute['key'])):
+                if attribute.value != feature.get(attribute.key):
                     update = True
-                    counter['updated'] += 1
+
+            if update:
+                counter['updated'] += 1
         else:
             update = True
             counter['new'] += 1
@@ -61,10 +63,31 @@ def ingest_trees_from_file(filename):
 
             # create attributes for this tree and this ingest
             for key in feature.fields:
-                Attribute.objects.create(tree=tree, ingest=ingest, key=key, value=feature.get(key))
+                if feature[key].type_name == 'String':
+                    String.objects.create(
+                        tree=tree,
+                        ingest=ingest,
+                        key=key,
+                        string_value=feature.get(key)
+                    )
+                elif feature[key].type_name == 'Integer':
+                    Integer.objects.create(
+                        tree=tree,
+                        ingest=ingest,
+                        key=key,
+                        integer_value=feature.get(key)
+                    )
+                elif feature[key].type_name == 'Float':
+                    Float.objects.create(
+                        tree=tree,
+                        ingest=ingest,
+                        key=key,
+                        float_value=feature.get(key)
+                    )
+                else:
+                    raise Exception('Unknown feature type.')
 
         else:
             counter['skipped'] += 1
 
-        print counter
     return counter
