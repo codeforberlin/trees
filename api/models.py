@@ -10,7 +10,7 @@ class Tree(models.Model):
         return 'tree_id=%i %s' % (self.pk, str(self.location))
 
     def get_current_properties(self):
-        self.attributes.filter(ingest=self.current_ingest)
+        return {attribute.key: attribute.value for attribute in self.attributes.filter(ingest=self.current_ingest)}
 
 
 class Ingest(models.Model):

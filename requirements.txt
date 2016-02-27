@@ -1,1 +1,4 @@
 Django==1.9
+
+djangorestframework
+djangorestframework-gis
