@@ -2,3 +2,4 @@ Django==1.9
 djangorestframework
 djangorestframework-gis
 psycopg2
+tqdm
