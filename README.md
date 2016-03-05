@@ -11,7 +11,7 @@ source env/bin/activate
 
 pip install -r requirements.txt
 
-cp trees/settings/default.local.py trees/settings/local.py
+cp trees/settings/sample.local.py trees/settings/local.py
 
 # edit trees/settings/local.py for your database connection
 
