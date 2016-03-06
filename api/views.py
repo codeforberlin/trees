@@ -3,6 +3,7 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework_gis.pagination import GeoJsonPagination
+from rest_framework_gis.filters import TMSTileFilter, DistanceToPointFilter, InBBoxFilter
 
 from .models import Tree, Attribute
 from .serializers import TreeSerializer
@@ -14,10 +15,25 @@ class TreePagination(GeoJsonPagination):
     max_page_size = 1000
 
 
-class TreeViewSet(viewsets.ReadOnlyModelViewSet):
+class AbstractViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tree.objects.all()
     serializer_class = TreeSerializer
     pagination_class = TreePagination
+
+
+class ListViewSet(AbstractViewSet):
+    pass
+
+
+class LocationViewSet(AbstractViewSet):
+
+    filter_backends = (DistanceToPointFilter, InBBoxFilter, TMSTileFilter)
+
+    distance_filter_field = 'location'
+    bbox_filter_field = 'location'
+
+    bbox_filter_include_overlapping = True
+    distance_filter_convert_meters = True
 
 
 class SearchViewSet(viewsets.ReadOnlyModelViewSet):
