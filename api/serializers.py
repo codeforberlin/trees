@@ -11,4 +11,4 @@ class TreeSerializer(GeoFeatureModelSerializer):
         geo_field = 'location'
 
     def get_properties(self, instance, fields):
-        return instance.current_attributes
+        return instance.properties

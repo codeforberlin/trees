@@ -11,9 +11,9 @@ class IngestAdmin(admin.ModelAdmin):
     pass
 
 
-class AttributeSetAdmin(admin.ModelAdmin):
+class HistoryAdmin(admin.ModelAdmin):
     pass
 
 admin.site.register(Tree, TreeAdmin)
 admin.site.register(Ingest, IngestAdmin)
-admin.site.register(AttributeSet, AttributeSetAdmin)
+admin.site.register(History, HistoryAdmin)

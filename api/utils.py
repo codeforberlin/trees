@@ -6,7 +6,7 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import GEOSGeometry
 from django.utils.timezone import now
 
-from api.models import Ingest, Tree, AttributeSet
+from api.models import Ingest, Tree, History
 
 
 def ingest_trees_from_file(filename):
@@ -37,39 +37,41 @@ def ingest_trees_from_file(filename):
         try:
             tree = Tree.objects.get(location=point)
         except Tree.DoesNotExist:
-            tree = Tree.objects.create(location=point, current_ingest=ingest)
+            tree = Tree(location=point)
 
         # create attributes dict for this tree
-        ingest_attributes = {}
+        ingest_properties = {}
         for key in feature.fields:
-            ingest_attributes[key] = feature[key].value
+            ingest_properties[key] = feature[key].value
 
-        # prepare update flag
-        update = False
+        if tree.properties:
+            if ingest_properties != tree.properties:
+                # the properties have changed, we will add the old properties to the history
+                history = History(
+                    ingest=tree.current_ingest,
+                    properties=tree.properties
+                )
 
-        # get the attributes of the current ingest of the tree
-        try:
-            current_attributes = AttributeSet.objects.get(tree=tree, ingest=tree.current_ingest).attributes
-            if ingest_attributes != current_attributes:
-                update = True
+                # now we can overwrite the current properties
+                tree.current_ingest = ingest
+                tree.properties = ingest_properties
+                tree.save()
+
+                # now we need to save the History object
+                history.tree = tree
+                history.save()
+
                 counter['updated'] += 1
-        except AttributeSet.DoesNotExist:
-            update = True
-            counter['new'] += 1
+            else:
+                # nothing has changed, we will skip this tree
+                counter['skipped'] += 1
 
-        # update the tree
-        if update:
-            # update the current_ingest field of the tree
+        else:
+            # this tree has not properties, it must be a new tree
             tree.current_ingest = ingest
+            tree.properties = ingest_properties
             tree.save()
 
-            # create attribute set for this tree and this ingest
-            AttributeSet.objects.create(
-                tree=tree,
-                ingest=ingest,
-                attributes=ingest_attributes
-            )
-        else:
-            counter['skipped'] += 1
+            counter['new'] += 1
 
     return counter
