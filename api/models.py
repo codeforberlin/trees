@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 
+
 class Tree(models.Model):
 
     location = models.PointField()
@@ -9,8 +10,12 @@ class Tree(models.Model):
     def __str__(self):
         return 'tree_id=%i %s' % (self.pk, str(self.location))
 
-    # def get_current_properties(self):
-    #     return {attribute.key: attribute.value for attribute in self.attributes.filter(ingest=self.current_ingest)}
+    @property
+    def current_attributes(self):
+        try:
+            return AttributeSet.objects.get(tree=self, ingest=self.current_ingest).attributes
+        except AttributeSet.DoesNotExist:
+            return {}
 
 
 class Ingest(models.Model):
