@@ -1,6 +1,6 @@
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
-from .models import Tree, Attribute
+from .models import Tree
 
 
 class TreeSerializer(GeoFeatureModelSerializer):
