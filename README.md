@@ -54,7 +54,7 @@ http://localhost:8000/api/trees/1
 
 ### Location queries
 
-#### Distance to point:
+#### Distance to point
 
 ```
 http://localhost:8000/api/location/?dist=40&point=13.20887016004902,52.42724780253829
