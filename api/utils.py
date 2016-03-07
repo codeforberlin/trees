@@ -6,7 +6,7 @@ from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import GEOSGeometry
 from django.utils.timezone import now
 
-from api.models import Ingest, Tree, History
+from api.models import Ingest, Tree, PropertySet
 
 
 def ingest_trees_from_file(filename):
@@ -46,20 +46,16 @@ def ingest_trees_from_file(filename):
 
         if tree.properties:
             if ingest_properties != tree.properties:
-                # the properties have changed, we will add the old properties to the history
-                history = History(
-                    ingest=tree.current_ingest,
-                    properties=tree.properties
+                # the properties have changed, we will add the new properties to the history
+                propertyset = PropertySet.objects.create(
+                    tree=tree,
+                    ingest=ingest,
+                    properties=ingest_properties
                 )
 
-                # now we can overwrite the current properties
-                tree.current_ingest = ingest
-                tree.properties = ingest_properties
+                # now we need to update the tree for the current_propertyset
+                tree.current_propertyset = propertyset
                 tree.save()
-
-                # now we need to save the History object
-                history.tree = tree
-                history.save()
 
                 counter['updated'] += 1
             else:
@@ -67,9 +63,19 @@ def ingest_trees_from_file(filename):
                 counter['skipped'] += 1
 
         else:
-            # this tree has not properties, it must be a new tree
-            tree.current_ingest = ingest
-            tree.properties = ingest_properties
+            # this tree has no properties, it must be a new tree
+            # first we need to save the tree
+            tree.save()
+
+            # then we store the properties
+            propertyset = PropertySet.objects.create(
+                tree=tree,
+                ingest=ingest,
+                properties=ingest_properties
+            )
+
+            # now we need to update the tree for the current_propertyset
+            tree.current_propertyset = propertyset
             tree.save()
 
             counter['new'] += 1

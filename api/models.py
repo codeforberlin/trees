@@ -5,11 +5,17 @@ from django.contrib.postgres.fields import JSONField
 class Tree(models.Model):
 
     location = models.PointField()
-    properties = JSONField(blank=True, null=True)
-    current_ingest = models.ForeignKey('ingest', blank=True, null=True, on_delete=models.SET_NULL)
+    current_propertyset = models.ForeignKey('PropertySet', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
 
     def __str__(self):
         return 'tree_id=%i %s' % (self.pk, str(self.location))
+
+    @property
+    def properties(self):
+        if self.current_propertyset:
+            return self.current_propertyset.properties
+        else:
+            return None
 
 
 class Ingest(models.Model):
@@ -19,9 +25,9 @@ class Ingest(models.Model):
     ingested_at = models.DateTimeField(editable=False)
 
 
-class History(models.Model):
+class PropertySet(models.Model):
 
-    tree = models.ForeignKey('Tree', related_name='attributesets')
+    tree = models.ForeignKey('Tree', related_name='propertysets')
     ingest = models.ForeignKey('ingest')
     properties = JSONField(blank=True, null=True)
 
