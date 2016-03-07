@@ -1,10 +1,11 @@
+from collections import Counter
 from tqdm import tqdm
 
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import GEOSGeometry
 from django.utils.timezone import now
 
-from api.models import Ingest, Tree, Attribute, String, Integer, Float
+from api.models import Ingest, Tree, PropertySet
 
 
 def ingest_trees_from_file(filename):
@@ -19,12 +20,8 @@ def ingest_trees_from_file(filename):
         ingested_at=now()
     )
 
-    # prepare some counters
-    counter = {
-        'new': 0,
-        'updated': 0,
-        'skipped': 0
-    }
+    # prepare counter
+    counter = Counter()
 
     # loop over features in the data source (i.e. the trees)
     for feature in tqdm(data_source[0]):
@@ -35,59 +32,47 @@ def ingest_trees_from_file(filename):
         try:
             tree = Tree.objects.get(location=point)
         except Tree.DoesNotExist:
-            tree = Tree.objects.create(location=point, current_ingest=ingest)
+            tree = Tree(location=point)
 
-        # get the attributes of the current ingest of the tree
-        current_attributes = Attribute.objects.filter(tree=tree, ingest=tree.current_ingest)
+        # create attributes dict for this tree
+        ingest_properties = {}
+        for key in feature.fields:
+            ingest_properties[key] = feature[key].value
 
-        # prepare update flag
-        update = False
+        if tree.properties:
+            if ingest_properties != tree.properties:
+                # the properties have changed, we will add the new properties to the history
+                propertyset = PropertySet.objects.create(
+                    tree=tree,
+                    ingest=ingest,
+                    properties=ingest_properties
+                )
 
-        # check if one of the attributes changed
-        if current_attributes:
-            for attribute in current_attributes:
-                if attribute.value != feature.get(attribute.key):
-                    update = True
+                # now we need to update the tree for the current_propertyset
+                tree.current_propertyset = propertyset
+                tree.save()
 
-            if update:
                 counter['updated'] += 1
-        else:
-            update = True
-            counter['new'] += 1
+            else:
+                # nothing has changed, we will skip this tree
+                counter['skipped'] += 1
 
-        # update the tree
-        if update:
-            # update the current_ingest field of the tree
-            tree.current_ingest = ingest
+        else:
+            # this tree has no properties, it must be a new tree
+            # first we need to save the tree
             tree.save()
 
-            # create attributes for this tree and this ingest
-            for key in feature.fields:
-                if feature[key].type_name == 'String':
-                    String.objects.create(
-                        tree=tree,
-                        ingest=ingest,
-                        key=key,
-                        string_value=feature.get(key)
-                    )
-                elif feature[key].type_name == 'Integer':
-                    Integer.objects.create(
-                        tree=tree,
-                        ingest=ingest,
-                        key=key,
-                        integer_value=feature.get(key)
-                    )
-                elif feature[key].type_name == 'Float':
-                    Float.objects.create(
-                        tree=tree,
-                        ingest=ingest,
-                        key=key,
-                        float_value=feature.get(key)
-                    )
-                else:
-                    raise Exception('Unknown feature type.')
+            # then we store the properties
+            propertyset = PropertySet.objects.create(
+                tree=tree,
+                ingest=ingest,
+                properties=ingest_properties
+            )
 
-        else:
-            counter['skipped'] += 1
+            # now we need to update the tree for the current_propertyset
+            tree.current_propertyset = propertyset
+            tree.save()
+
+            counter['new'] += 1
 
     return counter

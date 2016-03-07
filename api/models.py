@@ -1,16 +1,21 @@
 from django.contrib.gis.db import models
+from django.contrib.postgres.fields import JSONField
 
 
 class Tree(models.Model):
 
     location = models.PointField()
-    current_ingest = models.ForeignKey('ingest', blank=True, null=True, on_delete=models.SET_NULL)
+    current_propertyset = models.ForeignKey('PropertySet', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
 
     def __str__(self):
         return 'tree_id=%i %s' % (self.pk, str(self.location))
 
-    def get_current_properties(self):
-        return {attribute.key: attribute.value for attribute in self.attributes.filter(ingest=self.current_ingest)}
+    @property
+    def properties(self):
+        if self.current_propertyset:
+            return self.current_propertyset.properties
+        else:
+            return None
 
 
 class Ingest(models.Model):
@@ -20,39 +25,11 @@ class Ingest(models.Model):
     ingested_at = models.DateTimeField(editable=False)
 
 
-class Attribute(models.Model):
+class PropertySet(models.Model):
 
-    tree = models.ForeignKey('Tree', related_name='attributes')
-
+    tree = models.ForeignKey('Tree', related_name='propertysets')
     ingest = models.ForeignKey('ingest')
-
-    key = models.SlugField(max_length=256)
-
-    @property
-    def value(self):
-        if hasattr(self, 'string'):
-            return self.string.string_value
-        elif hasattr(self, 'integer'):
-            return self.integer.integer_value
-        elif hasattr(self, 'float'):
-            return self.float.float_value
-        else:
-            raise Exception('Unknown value class.')
+    properties = JSONField(blank=True, null=True)
 
     def __str__(self):
-        return 'tree_id=%i ingest=%s key=%s' % (self.tree.pk, self.ingest.ingested_at, self.key)
-
-
-class String(Attribute):
-
-    string_value = models.CharField(max_length=256)
-
-
-class Float(Attribute):
-
-    float_value = models.FloatField(blank=True, null=True)
-
-
-class Integer(Attribute):
-
-    integer_value = models.IntegerField(blank=True, null=True)
+        return 'tree_id=%i ingest=%s' % (self.tree.pk, self.ingest.ingested_at)

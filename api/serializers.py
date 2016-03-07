@@ -1,6 +1,6 @@
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
-from .models import Tree, Attribute
+from .models import Tree
 
 
 class TreeSerializer(GeoFeatureModelSerializer):
@@ -11,4 +11,4 @@ class TreeSerializer(GeoFeatureModelSerializer):
         geo_field = 'location'
 
     def get_properties(self, instance, fields):
-        return instance.get_current_properties()
+        return instance.properties
