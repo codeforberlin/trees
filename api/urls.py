@@ -2,7 +2,7 @@ from django.conf.urls import url, include
 
 from rest_framework import routers
 
-from .views import ListViewSet, LocationViewSet, SearchViewSet
+from .views import TreeViewSet, LocationViewSet, SearchViewSet
 
 router = routers.DefaultRouter()
 router.register(r'trees', ListViewSet, base_name='tree')
