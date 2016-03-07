@@ -1,5 +1,4 @@
-import sys
-
+from collections import Counter
 from tqdm import tqdm
 
 from django.contrib.gis.gdal import DataSource
@@ -21,12 +20,8 @@ def ingest_trees_from_file(filename):
         ingested_at=now()
     )
 
-    # prepare some counters
-    counter = {
-        'new': 0,
-        'updated': 0,
-        'skipped': 0
-    }
+    # prepare counter
+    counter = Counter()
 
     # loop over features in the data source (i.e. the trees)
     for feature in tqdm(data_source[0]):
