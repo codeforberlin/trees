@@ -1,5 +1,18 @@
 # Trees
 
+## Roadmap / features
+
+- [x] Command to import GML file
+- [x] API endpoint to filter by properties
+- [x] API endpoint to filter by distance from point
+- [x] API endpoint to filter by bounding box
+- [ ] Filter combining by properties, distance from point, bounding box (Django filters, DRF-GIS)
+- [ ] Advanced filtering such as greater then year, fuzzy search on strings
+- [ ] Server-side clustering
+
+tbc.
+
+
 ## Set up
 
 ``` bash
