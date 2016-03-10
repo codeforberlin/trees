@@ -1,4 +1,5 @@
 from collections import Counter
+from datetime import datetime
 from tqdm import tqdm
 
 from django.contrib.gis.gdal import DataSource
@@ -8,15 +9,18 @@ from django.utils.timezone import now
 from api.models import Ingest, Tree, PropertySet
 
 
-def ingest_trees_from_file(filename):
+def ingest_trees_from_file(filename, downloaded_at):
 
     # parse the file (probably gml) with the gdal DataSource class
     data_source = DataSource(filename)
 
+    # parse download date from user input
+    downloaded_at_date = datetime.strptime(downloaded_at, '%Y-%m-%dT%H:%MZ')
+
     # create an object in the ingest table
     ingest = Ingest.objects.create(
         filename=filename,
-        downloaded_at=now(),
+        downloaded_at=downloaded_at_date,
         ingested_at=now()
     )
 
