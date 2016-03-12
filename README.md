@@ -48,7 +48,7 @@ DATABASES = {
 $ ./manage.py migrate
 $ ./manage.py createsuperuser
 
-$ ./manage.py ingest GMLFILE
+$ ./manage.py ingest GMLFILE 2016-02-29T13:00Z
 
 $ ./manage.py runserver
 ```
