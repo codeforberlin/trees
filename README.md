@@ -1,17 +1,29 @@
 # Trees
 
+A street tree API based on Django and PostgreSQL/PostGIS.
+
+
+## Roadmap / features
+
+- [x] Command to import GML file
+- [x] API endpoint to filter by properties
+- [x] API endpoint to filter by distance from point
+- [x] API endpoint to filter by bounding box
+- [ ] Filter combining by properties, distance from point, bounding box (Django filters, DRF-GIS)
+- [ ] Advanced filtering such as greater then year, fuzzy search on strings
+- [ ] Server-side clustering
+
+tbc.
+
+
 ## Set up
 
 ``` bash
 $ git clone https://github.com/jochenklar/trees
-
 $ cd trees
-
 $ virtualenv env
 $ source env/bin/activate
-
 $ pip install -r requirements.txt
-
 $ cp trees/settings/sample.local.py trees/settings/local.py
 ```
 
@@ -34,9 +46,7 @@ DATABASES = {
 ``` bash
 $ ./manage.py migrate
 $ ./manage.py createsuperuser
-
-$ ./manage.py ingest GMLFILE
-
+$ ./manage.py ingest GMLFILE 2016-02-29T13:00Z
 $ ./manage.py runserver
 ```
 
