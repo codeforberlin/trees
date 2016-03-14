@@ -1,5 +1,8 @@
 # Trees
 
+A street tree API based on Django and PostgreSQL/PostGIS.
+
+
 ## Roadmap / features
 
 - [x] Command to import GML file
