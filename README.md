@@ -17,14 +17,10 @@ tbc.
 
 ``` bash
 $ git clone https://github.com/jochenklar/trees
-
 $ cd trees
-
 $ virtualenv env
 $ source env/bin/activate
-
 $ pip install -r requirements.txt
-
 $ cp trees/settings/sample.local.py trees/settings/local.py
 ```
 
@@ -47,9 +43,7 @@ DATABASES = {
 ``` bash
 $ ./manage.py migrate
 $ ./manage.py createsuperuser
-
 $ ./manage.py ingest GMLFILE 2016-02-29T13:00Z
-
 $ ./manage.py runserver
 ```
 
