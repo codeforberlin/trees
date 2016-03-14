@@ -67,17 +67,23 @@ http://localhost:8000/api/trees/1
 #### Distance to point
 
 ```
-http://localhost:8000/api/location/?dist=40&point=13.20887016004902,52.42724780253829
+http://localhost:8000/api/search/?dist=40&point=13.20887016004902,52.42724780253829
 ```
 
 #### On TMS tile
 
 ```
-http://localhost:8000/api/location/?tile=16/35172/21520
+http://localhost:8000/api/search/?tile=16/35172/21520
 ```
 
 #### In bounding box
 
 ```
-http://localhost:8000/api/location/?in_bbox=13.20,52.427,13.21,52.428
+http://localhost:8000/api/search/?in_bbox=13.20,52.427,13.21,52.428
+```
+
+#### Properties
+
+```
+http://localhost:8000/api/search/?art_dtsch=LINDE&bezirk=Spandau
 ```
