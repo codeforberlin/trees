@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import JSONField
 
 class Tree(models.Model):
 
-    location = models.PointField()
+    location = models.PointField(srid=25833)
     current_propertyset = models.ForeignKey('PropertySet', blank=True, null=True, on_delete=models.SET_NULL, related_name='+')
 
     def __str__(self):
