@@ -24,4 +24,4 @@ class TreeViewSet(viewsets.ReadOnlyModelViewSet):
     bbox_filter_field = 'location'
 
     bbox_filter_include_overlapping = True
-    distance_filter_convert_meters = True
+    # distance_filter_convert_meters = True
