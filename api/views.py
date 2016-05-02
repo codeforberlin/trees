@@ -1,10 +1,9 @@
 from rest_framework import viewsets
 from rest_framework_gis.pagination import GeoJsonPagination
-from rest_framework_gis.filters import TMSTileFilter, DistanceToPointFilter, InBBoxFilter
 
 from .models import Tree
 from .serializers import TreeSerializer
-from .filters import PropertyFilter
+from .filters import PropertyFilter, DistanceToPointFilter
 
 
 class TreePagination(GeoJsonPagination):
@@ -18,10 +17,9 @@ class TreeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = TreeSerializer
     pagination_class = TreePagination
 
-    filter_backends = (DistanceToPointFilter, InBBoxFilter, TMSTileFilter, PropertyFilter)
+    filter_backends = (DistanceToPointFilter, PropertyFilter)
 
     distance_filter_field = 'location'
     bbox_filter_field = 'location'
 
     bbox_filter_include_overlapping = True
-    distance_filter_convert_meters = True
