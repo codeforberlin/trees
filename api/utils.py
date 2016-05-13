@@ -1,7 +1,10 @@
-from collections import Counter
-from datetime import datetime
-from tqdm import tqdm
+import csv
 
+from collections import Counter
+from tqdm import tqdm
+from dateutil.parser import parse as dateutil_parse
+
+from django.conf import settings
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import GEOSGeometry
 from django.utils.timezone import now
@@ -11,11 +14,16 @@ from api.models import Ingest, Tree, PropertySet
 
 def ingest_trees_from_file(filename, downloaded_at):
 
+    if settings.COLUMN_NAMES_CSV:
+        column_names = _parse_column_names_csv()
+    else:
+        column_names = {}
+
     # parse the file (probably gml) with the gdal DataSource class
     data_source = DataSource(filename)
 
     # parse download date from user input
-    downloaded_at_date = datetime.strptime(downloaded_at, '%Y-%m-%dT%H:%MZ')
+    downloaded_at_date = dateutil_parse(downloaded_at)
 
     # create an object in the ingest table
     ingest = Ingest.objects.create(
@@ -41,7 +49,12 @@ def ingest_trees_from_file(filename, downloaded_at):
         # create attributes dict for this tree
         ingest_properties = {}
         for key in feature.fields:
-            ingest_properties[key] = feature[key].value
+            if key in column_names:
+                column_name = column_names[key]
+            else:
+                column_name = key
+
+            ingest_properties[column_name] = feature[key].value
 
         if tree.properties:
             if ingest_properties != tree.properties:
@@ -80,3 +93,17 @@ def ingest_trees_from_file(filename, downloaded_at):
             counter['new'] += 1
 
     return counter
+
+
+def _parse_column_names_csv():
+    column_names = {}
+    with open(settings.COLUMN_NAMES_CSV, 'rb') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',')
+
+        for row in reader:
+            if row:
+                for column_name in row[1].split(';'):
+                    if column_name:
+                        column_names[column_name] = row[0]
+
+    return column_names
