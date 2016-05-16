@@ -14,9 +14,9 @@ from api.models import Ingest, Tree, PropertySet
 
 def ingest_trees_from_file(filename, downloaded_at):
 
-    if settings.COLUMN_NAMES_CSV:
+    try:
         column_names = _parse_column_names_csv()
-    else:
+    except AttributeError:
         column_names = {}
 
     # parse the file (probably gml) with the gdal DataSource class
