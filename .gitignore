@@ -10,5 +10,6 @@ bower_root
 .DS_Store
 
 env
+env3
 
 *.sqlite3
