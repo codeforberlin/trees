@@ -25,6 +25,9 @@ class Ingest(models.Model):
     downloaded_at = models.DateTimeField(editable=False)
     ingested_at = models.DateTimeField(editable=False)
 
+    def __str__(self):
+        return 'ingested_at=%s dataset=%i ' % (self.ingested_at, self.dataset)
+
 
 class PropertySet(models.Model):
 
