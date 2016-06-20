@@ -12,7 +12,7 @@ from django.utils.timezone import now
 from api.models import Ingest, Tree, PropertySet
 
 
-def ingest_trees_from_file(filename, downloaded_at):
+def ingest_trees_from_file(dataset, filename, downloaded_at):
 
     try:
         column_names = _parse_column_names_csv()
@@ -27,6 +27,7 @@ def ingest_trees_from_file(filename, downloaded_at):
 
     # create an object in the ingest table
     ingest = Ingest.objects.create(
+        dataset=dataset,
         filename=filename,
         downloaded_at=downloaded_at_date,
         ingested_at=now()

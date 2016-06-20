@@ -20,6 +20,7 @@ class Tree(models.Model):
 
 class Ingest(models.Model):
 
+    dataset = models.SlugField(null=True)
     filename = models.CharField(max_length=256)
     downloaded_at = models.DateTimeField(editable=False)
     ingested_at = models.DateTimeField(editable=False)
