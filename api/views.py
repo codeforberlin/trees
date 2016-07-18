@@ -1,8 +1,10 @@
 from rest_framework import viewsets
 from rest_framework_gis.pagination import GeoJsonPagination
+from rest_framework.decorators import detail_route
+from rest_framework.response import Response
 
-from .models import Tree
-from .serializers import TreeSerializer
+from .models import Tree, PropertySet
+from .serializers import TreeSerializer, HistorySerializer
 from .filters import PropertyFilter, DistanceToPointFilter
 
 
@@ -23,3 +25,8 @@ class TreeViewSet(viewsets.ReadOnlyModelViewSet):
     bbox_filter_field = 'location'
 
     bbox_filter_include_overlapping = True
+
+    @detail_route(methods=['get'])
+    def history(self, request, pk):
+        history = PropertySet.objects.filter(tree_id=pk).order_by('ingest__downloaded_at')
+        return Response(HistorySerializer(history, many=True).data)
