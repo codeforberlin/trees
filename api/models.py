@@ -17,6 +17,13 @@ class Tree(models.Model):
         else:
             return None
 
+    @property
+    def ingest(self):
+        if self.current_propertyset:
+            return self.current_propertyset.ingest
+        else:
+            return None
+
 
 class Ingest(models.Model):
 
