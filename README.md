@@ -19,7 +19,7 @@ tbc.
 ## Set up
 
 ``` bash
-$ git clone https://github.com/codeforde/trees
+$ git clone https://github.com/codeforberlin/trees
 $ cd trees
 $ virtualenv env
 $ source env/bin/activate
