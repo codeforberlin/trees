@@ -2,6 +2,7 @@ Django==1.9
 djangorestframework
 djangorestframework-gis
 django-filter
-python-dateutil
 psycopg2
 tqdm
+pytz
+iso8601

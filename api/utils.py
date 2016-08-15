@@ -1,36 +1,58 @@
 import csv
+import xml.sax
+import pytz
+import iso8601
 
 from collections import Counter
 from tqdm import tqdm
-from dateutil.parser import parse as dateutil_parse
+from dateutil import parser, tz
 
 from django.conf import settings
 from django.contrib.gis.gdal import DataSource
 from django.contrib.gis.geos import GEOSGeometry
-from django.utils.timezone import now
+from django.utils import timezone
 
 from api.models import Ingest, Tree, PropertySet
 
 
-def ingest_trees_from_file(dataset, filename, downloaded_at):
+def get_timestamp(filename):
+
+    class GMLHandler(xml.sax.ContentHandler):
+
+        timestamp = None
+
+        def startElement(self, name, attrs):
+            if name == "wfs:FeatureCollection":
+                self.timestamp = attrs['timeStamp']
+
+    handler = GMLHandler()
+    parser = xml.sax.make_parser()
+    parser.setContentHandler(handler)
+    parser.parse(filename)
+
+    timestamp = iso8601.parse_date(handler.timestamp, default_timezone=None)
+    return pytz.timezone(settings.TIME_ZONE).localize(timestamp)
+
+
+def ingest_trees_from_file(dataset, filename):
 
     try:
         column_names = _parse_column_names_csv()
     except AttributeError:
         column_names = {}
 
+    # parse the file using a sax parser to get the timestamp
+    downloaded_at = get_timestamp(filename)
+
     # parse the file (probably gml) with the gdal DataSource class
     data_source = DataSource(filename)
-
-    # parse download date from user input
-    downloaded_at_date = dateutil_parse(downloaded_at)
 
     # create an object in the ingest table
     ingest = Ingest.objects.create(
         dataset=dataset,
         filename=filename,
-        downloaded_at=downloaded_at_date,
-        ingested_at=now()
+        downloaded_at=downloaded_at,
+        ingested_at=timezone.now()
     )
 
     # prepare counter
@@ -58,7 +80,14 @@ def ingest_trees_from_file(dataset, filename, downloaded_at):
             ingest_properties[column_name] = feature[key].value
 
         if tree.properties:
-            if ingest_properties != tree.properties:
+
+            update = True
+            for propertyset in tree.propertysets.all():
+                if ingest_properties == propertyset.properties:
+                    update = False
+                    break
+
+            if update:
                 # the properties have changed, we will add the new properties to the history
                 propertyset = PropertySet.objects.create(
                     tree=tree,
