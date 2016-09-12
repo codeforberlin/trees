@@ -23,31 +23,19 @@ class DistanceToPointFilter(gis_filters.DistanceToPointFilter):
 
 
 class PropertyFilter(filters.BaseFilterBackend):
-    property_fields = (
-        'art_bot',
-        'standortnr',
-        'spatial_name',
-        'kennzeich',
-        'kronedurch',
-        'bezirk',
-        'standalter',
-        'stammumfg',
-        'baumhoehe',
-        'spatial_alias',
-        'gml_id',
-        'namenr',
-        'fid',
-        'gattung',
-        'spatial_type',
-        'pflanzjahr',
-        'art_dtsch'
+
+    reserved_fields = (
+        'dist',
+        'point',
+        'tile',
+        'in_bbox'
     )
 
     def filter_queryset(self, request, queryset, view):
 
         query_kwargs = {}
         for key in request.GET:
-            if key in self.property_fields:
+            if key not in self.reserved_fields:
                 field = r'current_propertyset__properties__%s' % key
                 query_kwargs[field] = request.GET.get(key)
 

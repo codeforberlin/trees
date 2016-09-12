@@ -50,7 +50,7 @@ $ ./manage.py ingest GMLFILE 2016-02-29T13:00Z
 $ ./manage.py runserver
 ```
 
-go to http://localhost:8000/admin/ or http://localhost:8000/api/
+go to http://localhost:8000/admin/ or http://localhost:8000
 
 
 ## Making Queries
@@ -58,8 +58,8 @@ go to http://localhost:8000/admin/ or http://localhost:8000/api/
 ### REST style object retrieval
 
 ```
-http://localhost:8000/api/trees/
-http://localhost:8000/api/trees/1
+http://localhost:8000/trees/
+http://localhost:8000/trees/1
 ```
 
 ### Location queries
@@ -67,23 +67,23 @@ http://localhost:8000/api/trees/1
 #### Distance to point
 
 ```
-http://localhost:8000/api/trees/?dist=100&point=13.381018,52.498606
+http://localhost:8000/trees/?dist=100&point=13.381018,52.498606
 ```
 
 #### On TMS tile
 
 ```
-http://localhost:8000/api/trees/?tile=15/17602/10749
+http://localhost:8000/trees/?tile=15/17602/10749
 ```
 
 #### In bounding box
 
 ```
-http://localhost:8000/api/trees/?in_bbox=13.20,52.427,13.21,52.428
+http://localhost:8000/trees/?in_bbox=13.20,52.427,13.21,52.428
 ```
 
 #### Properties
 
 ```
-http://localhost:8000/api/trees/?art_dtsch=LINDE&bezirk=Spandau
+http://localhost:8000/trees/?art_dtsch=LINDE&bezirk=Spandau
 ```
