@@ -9,10 +9,25 @@ from dateutil import parser, tz
 
 from django.conf import settings
 from django.contrib.gis.gdal import DataSource
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import Point, GEOSGeometry
 from django.utils import timezone
 
-from api.models import Ingest, Tree, PropertySet
+from .models import Ingest, Tree, PropertySet
+
+
+def parse_point(point_string):
+    if not point_string:
+        return None
+
+    try:
+        (x, y) = (float(n) for n in point_string.split(','))
+    except ValueError:
+        raise ParseError('Invalid geometry string supplied for parameter {0}'.format(self.point_param))
+
+    p = Point(x, y, srid=4326)
+    p.transform(25833)
+
+    return p
 
 
 def get_timestamp(filename):
