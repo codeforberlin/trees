@@ -17,7 +17,9 @@ class PropertyFilter(filters.BaseFilterBackend):
         'dist',
         'point',
         'tile',
-        'in_bbox'
+        'in_bbox',
+        'page',
+        'page_size'
     )
 
     def filter_queryset(self, request, queryset, view):
