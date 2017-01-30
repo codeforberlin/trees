@@ -19,7 +19,8 @@ class PropertyFilter(filters.BaseFilterBackend):
         'tile',
         'in_bbox',
         'page',
-        'page_size'
+        'page_size',
+        'format'
     )
 
     def filter_queryset(self, request, queryset, view):
