@@ -1,6 +1,22 @@
 # Trees
 
-A street tree API based on Django and PostgreSQL/PostGIS.
+An API for Berlin's street trees.
+Based on Django and PostgreSQL/PostGIS.
+
+Trees are extracted from [Baumbestand Berlin](http://fbinter.stadt-berlin.de/fb/index.jsp?loginkey=zoomStart&mapId=k_wfs_baumbestand@senstadt).
+
+## Overview
+
+- Data source: [Baumbestand Berlin](http://fbinter.stadt-berlin.de/fb/index.jsp?loginkey=zoomStart&mapId=k_wfs_baumbestand@senstadt)
+- Data extraction via [codeforberlin/wfs-downloader](https://github.com/codeforberlin/wfs-downloader)
+- This is the API
+- Map for [trees.codefor.de](https://trees.codefor.de) via [codeforberlin/trees-map](https://github.com/codeforberlin/trees-map)
+- The map tiles and also the tree tiles are generated using [codeforberlin/trees-mapnik](https://github.com/codeforberlin/trees-mapnik)
+
+### Somewhat related
+
+- [codeforberlin/treemeta](https://github.com/codeforberlin/treemeta) collects botanical names which might be integrated in the API or by a client application.
+- [codeforberlin/tree-column-names](https://github.com/codeforberlin/tree-column-names) is not directly used in this project but the basis for the [column-names.json](https://trees.codefor.de/names/column-names.json) that is used.
 
 
 ## Roadmap / features
@@ -19,7 +35,7 @@ tbc.
 ## Set up
 
 ``` bash
-$ git clone https://github.com/codeforberlin/trees
+$ git clone https://github.com/codeforberlin/trees-api
 $ cd trees
 $ virtualenv env
 $ source env/bin/activate
